@@ -36,6 +36,7 @@ function Plotdiagrams(region)
     var casi = [];
     var activecase = [];
     var nuoviPositivi=[];
+    var decessi=[];
 	var average1=[];
     var d = [];
     //var x = regionSelector.selectedIndex;
@@ -49,6 +50,7 @@ function Plotdiagrams(region)
             activecase.push(el.totale_positivi);
             latestUpdate=el.data;
             nuoviPositivi.push(el.nuovi_positivi);
+            decessi.push(el.deceduti);
             count++;
         }
         
@@ -73,11 +75,18 @@ function Plotdiagrams(region)
         x:d,
         y:nuoviPositivi,
         type: 'scatter'
-    }
+    };
+
+    var trace4={
+        x:d,
+        y:decessi,
+        type:'scatter'
+    };
 
     var data = [trace1];
     var data2 = [trace2];
     var data3=[trace3];
+    var data4=[trace4];
     var layout = {
         title: `${latestUpdate} - Totale Casi ${region}`,
         showlegend: false
@@ -86,9 +95,13 @@ function Plotdiagrams(region)
     Plotly.newPlot('TotalCase', data, layout, { scrollZoom: false });
 
     layout.title = `${latestUpdate} - Casi Attivi ${region}`;
-    Plotly.newPlot('ActiveCase', data2, layout, { scrollZoom: false })
+    Plotly.newPlot('ActiveCase', data2, layout, { scrollZoom: false });
 
     layout.title = `${latestUpdate} - Nuovi Positivi ${region}`;
-    Plotly.newPlot('NewPositive',data3,layout,{scrollZoom: false})
+    Plotly.newPlot('NewPositive',data3,layout,{scrollZoom: false});
+
+    layout.title = `${latestUpdate} - Decessi ${region}`;
+    Plotly.newPlot('Decessi',data4,layout,{scrollZoom: false});
+
 
 }
