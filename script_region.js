@@ -75,7 +75,7 @@ function Plotdiagrams(region)
         {
             nuoviPositiviLastWeek+=nuoviPositivi[nuoviPositivi.length-i-1];
         }
-    var trace1 = {
+    var totalCases = {
         x: d,
         y: casi,
         type: 'scatter'
@@ -98,15 +98,15 @@ function Plotdiagrams(region)
         type:'scatter'
     };
 
-    var trace5={
+    var newPositiveAverage={
         x:d,
         y:average1,
         type:'scatter'
     };
 
-    var data = [trace1];
+    var data = [totalCases];
     var data2 = [trace2];
-    var data3=[trace3,trace5];
+    var data3=[trace3,newPositiveAverage];
     var data4=[trace4];
     var layout = {
         title: `${latestUpdate} - Totale Casi ${region}`,
