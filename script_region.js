@@ -51,6 +51,21 @@ function Plotdiagrams(region)
             latestUpdate=el.data;
             nuoviPositivi.push(el.nuovi_positivi);
             decessi.push(el.deceduti);
+            if (count<7)
+            {
+                LowerBound=0;
+            }
+            else
+            {
+            LowerBound=count-7;
+                }
+                sum=0;
+
+            for (i=LowerBound;i<count;i++){
+                sum+=(nuoviPositivi[i]/7);
+            }
+            average1.push(sum);
+
             count++;
         }
         
@@ -83,9 +98,15 @@ function Plotdiagrams(region)
         type:'scatter'
     };
 
+    var trace5={
+        x:d,
+        y:average1,
+        type:'scatter'
+    };
+
     var data = [trace1];
     var data2 = [trace2];
-    var data3=[trace3];
+    var data3=[trace3,trace5];
     var data4=[trace4];
     var layout = {
         title: `${latestUpdate} - Totale Casi ${region}`,
