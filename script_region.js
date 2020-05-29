@@ -39,6 +39,7 @@ function Plotdiagrams(region)
     var decessi=[];
 	var average1=[];
     var d = [];
+    const averageDepth = 7;
     //var x = regionSelector.selectedIndex;
     var latestUpdate;
 	var count=0;
@@ -51,18 +52,18 @@ function Plotdiagrams(region)
             latestUpdate=el.data;
             nuoviPositivi.push(el.nuovi_positivi);
             decessi.push(el.deceduti);
-            if (count<7)
+            if (count<averageDepth)
             {
                 LowerBound=0;
             }
             else
             {
-            LowerBound=count-7;
+            LowerBound=count-averageDepth;
                 }
                 sum=0;
 
             for (i=LowerBound;i<count;i++){
-                sum+=(nuoviPositivi[i]/7);
+                sum+=(nuoviPositivi[i]/averageDepth);
             }
             average1.push(sum);
 
