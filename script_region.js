@@ -37,12 +37,17 @@ function Plotdiagrams(region)
     var activecase = [];
     var nuoviPositivi=[];
     var decessi=[];
-	var average1=[];
+    var average1=[];
+    var totaleTamponi=[];
+    var deltaTamponi=[];
+    var newCase_Tamponi=[];
     var d = [];
     const averageDepth = 7;
     //var x = regionSelector.selectedIndex;
     var latestUpdate;
-	var count=0;
+    var count=0;
+    var lastTamponi=0;
+
     els.forEach(el => {
        
         if (el.denominazione_regione == region) {
@@ -52,6 +57,10 @@ function Plotdiagrams(region)
             latestUpdate=el.data;
             nuoviPositivi.push(el.nuovi_positivi);
             decessi.push(el.deceduti);
+            totaleTamponi.push(el.tamponi);
+            deltaTamponi.push(el.tamponi-lastTamponi);
+            newCase_Tamponi.push(el.nuovi_positivi/(el.tamponi-lastTamponi));
+            lastTamponi=el.tamponi;
             if (count<averageDepth)
             {
                 LowerBound=0;
@@ -105,10 +114,31 @@ function Plotdiagrams(region)
         type:'scatter'
     };
 
+    var traceTotTamponi={
+        x:d,
+        y:totaleTamponi,
+        type:'scatter'
+    };
+
+    var traceDeltaTamponi={
+        x:d,
+        y:deltaTamponi,
+        type:'scatter'
+    };
+
+    var traceNewCaseTamponi={
+        x:d,
+        y:newCase_Tamponi,
+        type:'scatter'
+    };
+
     var data = [totalCases];
     var data2 = [trace2];
     var data3=[trace3,newPositiveAverage];
     var data4=[trace4];
+    var data5=[traceNewCaseTamponi];
+    var data6=[traceDeltaTamponi];
+
     var layout = {
         title: `${latestUpdate} - Totale Casi ${region}`,
         showlegend: false
@@ -125,5 +155,10 @@ function Plotdiagrams(region)
     layout.title = `${latestUpdate} - Decessi ${region}`;
     Plotly.newPlot('Decessi',data4,layout,{scrollZoom: false});
 
+    layout.title = `${latestUpdate} - Positivi/Tamponi ${region}`;
+    Plotly.newPlot('Tamponi',data5,layout,{scrollZoom: false});
+
+    layout.title = `${latestUpdate} - Tamponi/giorno ${region}`;
+    Plotly.newPlot('Tamponi_day',data6,layout,{scrollZoom: false});
 
 }
