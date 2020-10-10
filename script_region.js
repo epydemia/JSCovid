@@ -85,6 +85,25 @@ function Plotdiagrams(region)
         {
             nuoviPositiviLastWeek+=nuoviPositivi[nuoviPositivi.length-i-1];
         }
+
+    var KPITamponi=0;
+        for (i=0;i<averageDepth;i++)
+        {
+            KPITamponi+=deltaTamponi[deltaTamponi.length-i-1]/averageDepth;
+        }
+    var KPIpositivitamponi=0;
+        for (i=0;i<averageDepth;i++)
+        {
+            KPIpositivitamponi+=newCase_Tamponi[newCase_Tamponi.length-i-1]/averageDepth;
+        }
+
+    let KPIDiv=document.getElementById('KPI')
+    KPIDiv.innerHTML=`<h3>KPI ${region}</h3>
+                        <p>Tamponi/giorno: ${KPITamponi.toFixed(0)}</p>
+                        <p>Positivi/Tampone: ${(KPIpositivitamponi*100).toFixed(1)}%</p>`
+
+
+    
     var totalCases = {
         x: d,
         y: casi,
