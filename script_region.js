@@ -41,6 +41,8 @@ function Plotdiagrams(region)
     var totaleTamponi=[];
     var deltaTamponi=[];
     var newCase_Tamponi=[];
+    var totale_ospedalizzati=[];
+    var terapia_intensiva=[];
     var d = [];
     const averageDepth = 7;
     //var x = regionSelector.selectedIndex;
@@ -60,6 +62,8 @@ function Plotdiagrams(region)
             totaleTamponi.push(el.tamponi);
             deltaTamponi.push(el.tamponi-lastTamponi);
             newCase_Tamponi.push(el.nuovi_positivi/(el.tamponi-lastTamponi));
+            totale_ospedalizzati.push(el.totale_ospedalizzati);
+            terapia_intensiva.push(el.terapia_intensiva);
             lastTamponi=el.tamponi;
             if (count<averageDepth)
             {
@@ -109,10 +113,25 @@ function Plotdiagrams(region)
         y: casi,
         type: 'scatter'
     };
-    var trace2 = {
+    var traceActiveCase = {
         x: d,
         y: activecase,
-        type: 'scatter'
+        type: 'scatter',
+        name: 'Active Case'
+    };
+
+    var traceOspedalizzati = {
+        x:d,
+        y:totale_ospedalizzati,
+        type:'scatter',
+        name:'Ricoverati'
+    };
+
+    var traceTerapiaIntensiva={
+        x:d,
+        y:terapia_intensiva,
+        type:'scatter',
+        name:'Terapia Intensiva'
     };
 
     var trace3={
@@ -152,7 +171,7 @@ function Plotdiagrams(region)
     };
 
     var data = [totalCases];
-    var data2 = [trace2];
+    var data2 = [traceActiveCase,traceOspedalizzati,traceTerapiaIntensiva];
     var data3=[trace3,newPositiveAverage];
     var data4=[trace4];
     var data5=[traceNewCaseTamponi];
@@ -166,9 +185,11 @@ function Plotdiagrams(region)
     Plotly.newPlot('TotalCase', data, layout, { scrollZoom: false });
 
     layout.title = `${latestUpdate} - Casi Attivi ${region}`;
+    layout.showlegend=true;
     Plotly.newPlot('ActiveCase', data2, layout, { scrollZoom: false });
 
     layout.title = `${latestUpdate} - Nuovi Positivi ${region}`;
+    layout.showlegend=false;
     Plotly.newPlot('NewPositive',data3,layout,{scrollZoom: false});
 
     layout.title = `${latestUpdate} - Decessi ${region}`;
