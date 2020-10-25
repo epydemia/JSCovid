@@ -65,6 +65,11 @@ function Plotdiagrams(region,els) {
     var count = 0;
     var lastTamponi = 0;
 
+    var MaxHostpital = 0;
+    var MaxIntensive = 0;
+    var dateMaxHospital="Never";
+    var dataMaxIntensive="Never";
+
     els.forEach(el => {
 
         if ((el.denominazione_regione == region) | (region=="Italy")) {
@@ -88,6 +93,20 @@ function Plotdiagrams(region,els) {
 
             totale_ospedalizzati.push(el.totale_ospedalizzati);
             terapia_intensiva.push(el.terapia_intensiva);
+
+            if (el.terapia_intensiva>=MaxIntensive)
+            {
+                MaxIntensive=el.terapia_intensiva;
+                dataMaxIntensive=el.data;
+            }
+
+            if (el.totale_ospedalizzati>=MaxHostpital)
+            {
+                MaxHostpital=el.totale_ospedalizzati;
+                dateMaxHospital=el.data;
+            }
+
+
             lastTamponi = el.tamponi;
             if (count < averageDepth) {
                 LowerBound = 0;
@@ -131,7 +150,15 @@ function Plotdiagrams(region,els) {
 		seriouscaseratio+=(terapia_intensiva[nuoviPositivi.length-i-1]/totale_ospedalizzati[nuoviPositivi.length-i-1])/7;
     }
 
-    let KPIDiv = document.getElementById('KPI')
+    let HistoryDiv=document.getElementById('HistoricalData');
+    HistoryDiv.innerHTML=`<h3>Historical Data</h3>
+                        <p>Intensive care max: ${MaxIntensive} (${dataMaxIntensive})</p>
+                        <p>Current intensive care: ${terapia_intensiva[nuoviPositivi.length-1]}</p>
+                        <p>Hospital max: ${MaxHostpital} (${dateMaxHospital})</p>
+                        <p>Current hospital: ${totale_ospedalizzati[nuoviPositivi.length-1]}</p>`;
+
+
+    let KPIDiv = document.getElementById('KPI');
     KPIDiv.innerHTML = `<h3>KPI ${region}</h3>
                         <p>Nuovi positivi in 7 giorni: ${nuoviPositiviLastWeek}</p>
                         <p>Positivi/Tampone: ${(positivitamponiLastWeek*100).toFixed(1)} %</p>
