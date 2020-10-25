@@ -110,6 +110,11 @@ function Plotdiagrams(region,els) {
     for (i = 0; i < 7; i++) {
         nuoviPositiviLastWeek += nuoviPositivi[nuoviPositivi.length - i - 1];
     }
+    var positivitamponiLastWeek=0;
+	for (i=0;i<7;i++)
+    {
+		positivitamponiLastWeek+=newCase_Tamponi[nuoviPositivi.length-i-1]/7;
+    }
 
     var KPITamponi = 0;
     for (i = 0; i < averageDepth; i++) {
@@ -120,11 +125,18 @@ function Plotdiagrams(region,els) {
         KPIpositivitamponi += newCase_Tamponi[newCase_Tamponi.length - i - 1] / averageDepth;
     }
 
+    var seriouscaseratio=0;
+    for (i=0;i<7;i++)
+    {
+		seriouscaseratio+=(terapia_intensiva[nuoviPositivi.length-i-1]/totale_ospedalizzati[nuoviPositivi.length-i-1])/7;
+    }
+
     let KPIDiv = document.getElementById('KPI')
     KPIDiv.innerHTML = `<h3>KPI ${region}</h3>
                         <p>Nuovi positivi in 7 giorni: ${nuoviPositiviLastWeek}</p>
+                        <p>Positivi/Tampone: ${(positivitamponiLastWeek*100).toFixed(1)} %</p>
                         <p>Tamponi/giorno: ${KPITamponi.toFixed(0)}</p>
-                        <p>Positivi/Tampone: ${(KPIpositivitamponi * 100).toFixed(1)}%</p>`
+                        <p>Intensive/Serious case ratio: ${(seriouscaseratio*100).toFixed(1)}`;
 
 
 
@@ -154,13 +166,13 @@ function Plotdiagrams(region,els) {
         name: 'Terapia Intensiva'
     };
 
-    var trace3 = {
+    var traceNuoviPositivi = {
         x: d,
         y: nuoviPositivi,
         type: 'scatter'
     };
 
-    var trace4 = {
+    var traceDecessi = {
         x: d,
         y: decessi,
         type: 'scatter'
@@ -194,8 +206,8 @@ function Plotdiagrams(region,els) {
 
     var data = [totalCases];
     var data2 = [traceActiveCase, traceOspedalizzati, traceTerapiaIntensiva];
-    var data3 = [trace3, newPositiveAverage];
-    var data4 = [trace4];
+    var data3 = [traceNuoviPositivi, newPositiveAverage];
+    var data4 = [traceDecessi];
     var data5 = [traceNewCaseTamponi];
     var data6 = [traceDeltaTamponi];
 
