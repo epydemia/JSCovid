@@ -1,9 +1,13 @@
 let regionSelector = document.getElementById('region');
 
-var els = [];
+var regionalData = [];
+var NationalData=[];
 var regioni = [];
 
 // Populate the regions dropdown menu
+var italyOpt=document.createElement('option');
+italyOpt.text="Italy";
+regionSelector.add(italyOpt);
 fetch('https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-regioni-latest.json')
     .then(ret => ret.json())
     .then(regions => {
@@ -22,17 +26,28 @@ fetch('https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-c
 fetch('https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-regioni.json')
     .then(ret => ret.json())
     .then(x => {
-        els = x;
-        Plotdiagrams('Abruzzo')
+        regionalData = x;
+        //Plotdiagrams('Abruzzo',regionalData);
     });
 
-
+    fetch('https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-andamento-nazionale.json')
+    .then(ret => ret.json())
+    .then(x => { NationalData = x;
+    Plotdiagrams('Italy',NationalData);
+ });
 regionSelector.addEventListener("change", evt => {
     regione = regionSelector.options[regionSelector.selectedIndex].text;
-    Plotdiagrams(regione);
+    if (regione=="Italy")
+    {
+        Plotdiagrams('Italy',NationalData);
+    }
+    else
+    {
+        Plotdiagrams(regione,regionalData);
+    }
 });
 
-function Plotdiagrams(region) {
+function Plotdiagrams(region,els) {
     var casi = [];
     var activecase = [];
     var nuoviPositivi = [];
@@ -52,7 +67,7 @@ function Plotdiagrams(region) {
 
     els.forEach(el => {
 
-        if (el.denominazione_regione == region) {
+        if ((el.denominazione_regione == region) | (region=="Italy")) {
             casi.push(el.totale_casi);
             d.push(el.data);
             activecase.push(el.totale_positivi);
