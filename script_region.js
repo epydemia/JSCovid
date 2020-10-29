@@ -162,6 +162,7 @@ function Plotdiagrams(region,els) {
 
     let HistoryDiv=document.getElementById('HistoricalData');
     HistoryDiv.innerHTML=`<h3>Historical Data</h3>
+                        <p>Total Death: ${decessi[decessi.length-1]}</p>
                         <p>Intensive care max: ${MaxIntensive} (${dataMaxIntensive})</p>
                         <p>Current intensive care: ${terapia_intensiva[nuoviPositivi.length-1]}</p>
                         <p>Hospital max: ${MaxHostpital} (${dateMaxHospital})</p>
@@ -170,10 +171,10 @@ function Plotdiagrams(region,els) {
 
     let KPIDiv = document.getElementById('KPI');
     KPIDiv.innerHTML = `<h3>KPI ${region}</h3>
-                        <p>Nuovi positivi in 7 giorni: ${nuoviPositiviLastWeek}</p>
-                        <p>Positivi/Tampone: ${(positivitamponiLastWeek*100).toFixed(1)} %</p>
-                        <p>Tamponi/giorno: ${KPITamponi.toFixed(0)}</p>
-                        <p>Intensive/Serious case ratio: ${(seriouscaseratio*100).toFixed(1)}`;
+                        <p>New Cases in 7 days: ${nuoviPositiviLastWeek}</p>
+                        <p>Positive/Test: ${(positivitamponiLastWeek*100).toFixed(1)} %</p>
+                        <p>Test/day: ${KPITamponi.toFixed(0)}</p>
+                        <p>Hospital/Intensive Care ratio: ${(seriouscaseratio*100).toFixed(1)} %`;
 
 
     // Plot Diagrams
@@ -211,7 +212,8 @@ function Plotdiagrams(region,els) {
 
     var traceDecessi = {
         x: d,
-        y: decessi,
+        //y: decessi,
+        y:deltaDecessi,
         type: 'scatter'
     };
 
