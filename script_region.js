@@ -3,6 +3,117 @@ let regionSelector = document.getElementById('region');
 var regionalData = [];
 var NationalData=[];
 var regioni = [];
+var ItalyPopulation=0;
+//var demographicData=[];
+
+var DatiDemograficiRegioni=[
+    {
+      "Regione": "Lombardia",
+      "Popolazione": 10103969,
+      "Superficie": 23863.65
+    },
+    {
+      "Regione": "Lazio",
+      "Popolazione": 5865544,
+      "Superficie": 17232.29
+    },
+    {
+      "Regione": "Campania",
+      "Popolazione": 5785861,
+      "Superficie": 13670.95
+    },
+    {
+      "Regione": "Sicilia",
+      "Popolazione": 4968410,
+      "Superficie": 25832.39
+    },
+    {
+      "Regione": "Veneto",
+      "Popolazione": 4907704,
+      "Superficie": 18345.35
+    },
+    {
+      "Regione": "Emilia-Romagna",
+      "Popolazione": 4467118,
+      "Superficie": 22452.78
+    },
+    {
+      "Regione": "Piemonte",
+      "Popolazione": 4341375,
+      "Superficie": 25387.07
+    },
+    {
+      "Regione": "Puglia",
+      "Popolazione": 4008296,
+      "Superficie": 19540.9
+    },
+    {
+      "Regione": "Toscana",
+      "Popolazione": 3722729,
+      "Superficie": 22987.04
+    },
+    {
+      "Regione": "Calabria",
+      "Popolazione": 1924701,
+      "Superficie": 15221.9
+    },
+    {
+      "Regione": "Sardegna",
+      "Popolazione": 1630474,
+      "Superficie": 24100.02
+    },
+    {
+      "Regione": "Liguria",
+      "Popolazione": 1543127,
+      "Superficie": 5416.21
+    },
+    {
+      "Regione": "Marche",
+      "Popolazione": 1518400,
+      "Superficie": 9401.38
+    },
+    {
+      "Regione": "Abruzzo",
+      "Popolazione": 1305770,
+      "Superficie": 10831.84
+    },
+    {
+      "Regione": "Friuli Venezia Giulia",
+      "Popolazione": 1211357,
+      "Superficie": 7924.36
+    },
+    {
+      "Regione": "P.A. Trento",
+      "Popolazione": 542739, 
+      "Superficie": 13605.5 // Total of Trentino alto adige
+    },
+    {
+        "Regione": "P.A. Bolzano",
+        "Popolazione": 532080, 
+        "Superficie": 13605.5 // Total of Trentino alto adige
+    },
+    {
+      "Regione": "Umbria",
+      "Popolazione": 880285,
+      "Superficie": 8464.33
+    },
+    {
+      "Regione": "Basilicata",
+      "Popolazione": 556934,
+      "Superficie": 10073.32
+    },
+    {
+      "Regione": "Molise",
+      "Popolazione": 302265,
+      "Superficie": 4460.65
+    },
+    {
+      "Regione": "Valle d'Aosta",
+      "Popolazione": 125501,
+      "Superficie": 3260.9
+    }
+   ];
+
 
 // Populate the regions dropdown menu
 var italyOpt=document.createElement('option');
@@ -16,13 +127,28 @@ fetch('https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-c
             var option = document.createElement('option');
             option.text = reg.denominazione_regione;
             regionSelector.add(option);
+            var pop=GetDemographicData(reg.denominazione_regione);
+            if (pop==0)
+            {
+                console.log(reg.denominazione_regione);
+            }
+            
         })
     }
 
 
     );
 
+    for (i=0;i<DatiDemograficiRegioni.length;i++)
+    {
+        ItalyPopulation+=DatiDemograficiRegioni[i].Popolazione;
+    }
 
+
+
+
+
+// Load COVID-19 data
 fetch('https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-regioni.json')
     .then(ret => ret.json())
     .then(x => {
@@ -33,21 +159,23 @@ fetch('https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-c
     fetch('https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-andamento-nazionale.json')
     .then(ret => ret.json())
     .then(x => { NationalData = x;
-    Plotdiagrams('Italy',NationalData);
+    Plotdiagrams('Italy',NationalData,ItalyPopulation);
  });
+
+ // Bind events to selector and initialize webpage
 regionSelector.addEventListener("change", evt => {
     regione = regionSelector.options[regionSelector.selectedIndex].text;
     if (regione=="Italy")
     {
-        Plotdiagrams('Italy',NationalData);
+        Plotdiagrams('Italy',NationalData,ItalyPopulation);
     }
     else
     {
-        Plotdiagrams(regione,regionalData);
+        Plotdiagrams(regione,regionalData,GetDemographicData(regione));
     }
 });
 
-function Plotdiagrams(region,els) {
+function Plotdiagrams(region,els,totalPopulation) {
     var casi = [];
     var activecase = [];
     var nuoviPositivi = [];
@@ -171,7 +299,9 @@ function Plotdiagrams(region,els) {
 
     let KPIDiv = document.getElementById('KPI');
     KPIDiv.innerHTML = `<h3>KPI ${region}</h3>
+                        <p>Population: ${totalPopulation}</p>
                         <p>New Cases in 7 days: ${nuoviPositiviLastWeek}</p>
+                        <p>Incidence 7-days-cases/100k : ${(nuoviPositiviLastWeek/totalPopulation*100000).toFixed(1)}</p>
                         <p>Positive/Test: ${(positivitamponiLastWeek*100).toFixed(1)} %</p>
                         <p>Test/day: ${KPITamponi.toFixed(0)}</p>
                         <p>Hospital/Intensive Care ratio: ${(seriouscaseratio*100).toFixed(1)} %`;
@@ -292,4 +422,16 @@ function filterdata(data, depth) {
         average1.push(sum);
     }
     return average1;
+}
+
+function GetDemographicData(region)
+{
+    for (i=0;i<DatiDemograficiRegioni.length;i++)   
+    {
+        if (DatiDemograficiRegioni[i].Regione==region)
+        {
+            return DatiDemograficiRegioni[i].Popolazione;
+        }
+    }
+    return 0;
 }
