@@ -53,7 +53,7 @@ function Plotdiagrams(region,els) {
     var nuoviPositivi = [];
     var decessi = [];
     var deltaDecessi=[];
-    var average1 = [];
+
     var totaleTamponi = [];
     var deltaTamponi = [];
     var newCase_Tamponi = [];
@@ -63,7 +63,7 @@ function Plotdiagrams(region,els) {
     const averageDepth = 7;
     //var x = regionSelector.selectedIndex;
     var latestUpdate;
-    var count = 0;
+
     var lastTamponi = 0;
     var lastDecessi=0;
 
@@ -127,22 +127,6 @@ function Plotdiagrams(region,els) {
                 dataMaxIntensive=el.data;
             }
 
-            
-
-            if (count < averageDepth) {
-                LowerBound = 0;
-            }
-            else {
-                LowerBound = count - averageDepth;
-            }
-            sum = 0;
-
-            for (i = LowerBound; i < count; i++) {
-                sum += (nuoviPositivi[i] / averageDepth);
-            }
-            average1.push(sum);
-
-            count++;
         }
 
     });
@@ -233,7 +217,6 @@ function Plotdiagrams(region,els) {
 
     var newPositiveAverage = {
         x: d,
-        //y: average1,
         y:filterdata(nuoviPositivi,averageDepth),
         type: 'scatter'
     };
