@@ -52,6 +52,7 @@ function Plotdiagrams(region,els) {
     var activecase = [];
     var nuoviPositivi = [];
     var decessi = [];
+    var deltaDecessi=[];
     var average1 = [];
     var totaleTamponi = [];
     var deltaTamponi = [];
@@ -64,6 +65,7 @@ function Plotdiagrams(region,els) {
     var latestUpdate;
     var count = 0;
     var lastTamponi = 0;
+    var lastDecessi=0;
 
     var MaxHostpital = 0;
     var MaxIntensive = 0;
@@ -73,14 +75,28 @@ function Plotdiagrams(region,els) {
     els.forEach(el => {
 
         if ((el.denominazione_regione == region) | (region=="Italy")) {
-            casi.push(el.totale_casi);
+            
+
+            // Process Date
             d.push(el.data);
-            activecase.push(el.totale_positivi);
             latestUpdate = el.data;
+            activecase.push(el.totale_positivi);
+           
+            // Process Total Case
+            casi.push(el.totale_casi);
+
+            // Process New Cases
             nuoviPositivi.push(el.nuovi_positivi);
+
+            // Process death
             decessi.push(el.deceduti);
+            deltaDecessi.push(el.deceduti-lastDecessi);
+            lastDecessi=el.deceduti;
+
+            // Process Tamponi
             totaleTamponi.push(el.tamponi);
             deltaTamponi.push(el.tamponi - lastTamponi);
+            
             if (el.tamponi - lastTamponi == 0) {
 
                 newCase_Tamponi.push(0);
@@ -91,7 +107,18 @@ function Plotdiagrams(region,els) {
                 newCase_Tamponi.push(el.nuovi_positivi / (el.tamponi - lastTamponi));
             }
 
+            lastTamponi = el.tamponi;
+
+            // Process Hospital resource
             totale_ospedalizzati.push(el.totale_ospedalizzati);
+
+            if (el.totale_ospedalizzati>=MaxHostpital)
+            {
+                MaxHostpital=el.totale_ospedalizzati;
+                dateMaxHospital=el.data;
+            }
+
+            // Process Intensive Care
             terapia_intensiva.push(el.terapia_intensiva);
 
             if (el.terapia_intensiva>=MaxIntensive)
@@ -100,14 +127,8 @@ function Plotdiagrams(region,els) {
                 dataMaxIntensive=el.data;
             }
 
-            if (el.totale_ospedalizzati>=MaxHostpital)
-            {
-                MaxHostpital=el.totale_ospedalizzati;
-                dateMaxHospital=el.data;
-            }
+            
 
-
-            lastTamponi = el.tamponi;
             if (count < averageDepth) {
                 LowerBound = 0;
             }
@@ -125,10 +146,14 @@ function Plotdiagrams(region,els) {
         }
 
     });
+
+
+    // Compute KPI
     var nuoviPositiviLastWeek = 0;
     for (i = 0; i < 7; i++) {
         nuoviPositiviLastWeek += nuoviPositivi[nuoviPositivi.length - i - 1];
     }
+
     var positivitamponiLastWeek=0;
 	for (i=0;i<7;i++)
     {
@@ -139,6 +164,7 @@ function Plotdiagrams(region,els) {
     for (i = 0; i < averageDepth; i++) {
         KPITamponi += deltaTamponi[deltaTamponi.length - i - 1] / averageDepth;
     }
+
     var KPIpositivitamponi = 0;
     for (i = 0; i < averageDepth; i++) {
         KPIpositivitamponi += newCase_Tamponi[newCase_Tamponi.length - i - 1] / averageDepth;
@@ -166,7 +192,7 @@ function Plotdiagrams(region,els) {
                         <p>Intensive/Serious case ratio: ${(seriouscaseratio*100).toFixed(1)}`;
 
 
-
+    // Plot Diagrams
     var totalCases = {
         x: d,
         y: casi,
@@ -207,7 +233,8 @@ function Plotdiagrams(region,els) {
 
     var newPositiveAverage = {
         x: d,
-        y: average1,
+        //y: average1,
+        y:filterdata(nuoviPositivi,averageDepth),
         type: 'scatter'
     };
 
@@ -228,7 +255,6 @@ function Plotdiagrams(region,els) {
         y: newCase_Tamponi,
         type: 'scatter'
     };
-
 
 
     var data = [totalCases];
