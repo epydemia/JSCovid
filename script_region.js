@@ -181,6 +181,9 @@ function Plotdiagrams(region,els,totalPopulation) {
     var nuoviPositivi = [];
     var decessi = [];
     var deltaDecessi=[];
+    var recovered=[];
+    var closedCase=[];
+    var deathRate=[];
 
     var totaleTamponi = [];
     var deltaTamponi = [];
@@ -221,6 +224,11 @@ function Plotdiagrams(region,els,totalPopulation) {
             deltaDecessi.push(el.deceduti-lastDecessi);
             lastDecessi=el.deceduti;
 
+            // Process Recovered
+            var currentClosedCase=el.totale_case-el.totale_positivi;
+            var currentRecovered=currentClosedCase-el.deceduti;
+            deathRate.push(el.deceduti/currentClosedCase);
+            
             // Process Tamponi
             totaleTamponi.push(el.tamponi);
             deltaTamponi.push(el.tamponi - lastTamponi);
@@ -282,6 +290,9 @@ function Plotdiagrams(region,els,totalPopulation) {
         KPIpositivitamponi += newCase_Tamponi[newCase_Tamponi.length - i - 1] / averageDepth;
     }
 
+    var KPIDeathRate=0;
+    KPIDeathRate=decessi[decessi.length-1]/(casi[casi.length-1]-activecase[activecase.length-1])*100;
+
     var seriouscaseratio=0;
     for (i=0;i<7;i++)
     {
@@ -304,7 +315,8 @@ function Plotdiagrams(region,els,totalPopulation) {
                         <p>Incidence 7-days-cases/100k : ${(nuoviPositiviLastWeek/totalPopulation*100000).toFixed(1)}</p>
                         <p>Positive/Test: ${(positivitamponiLastWeek*100).toFixed(1)} %</p>
                         <p>Test/day: ${KPITamponi.toFixed(0)}</p>
-                        <p>Hospital/Intensive Care ratio: ${(seriouscaseratio*100).toFixed(1)} %`;
+                        <p>Hospital/Intensive Care ratio: ${(seriouscaseratio*100).toFixed(1)} %</p>
+                        <p>Death Rate: ${KPIDeathRate.toFixed(1)} %</p>`;
 
 
     // Plot Diagrams
