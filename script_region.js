@@ -181,9 +181,8 @@ function Plotdiagrams(region,els,totalPopulation) {
     var nuoviPositivi = [];
     var decessi = [];
     var deltaDecessi=[];
-    var recovered=[];
-    var closedCase=[];
     var deathRate=[];
+    var Incidence7days=[];
 
     var totaleTamponi = [];
     var deltaTamponi = [];
@@ -224,11 +223,26 @@ function Plotdiagrams(region,els,totalPopulation) {
             deltaDecessi.push(el.deceduti-lastDecessi);
             lastDecessi=el.deceduti;
 
-            // Process Recovered
-            var currentClosedCase=el.totale_case-el.totale_positivi;
-            var currentRecovered=currentClosedCase-el.deceduti;
-            deathRate.push(el.deceduti/currentClosedCase);
-            
+            // Process Death Rate
+            deathRate.push(el.deceduti/(el.totale_casi-el.totale_positivi)*100);
+
+            // Process 7 days incidence
+            var last7days=0;
+            if (nuoviPositivi.length<7)
+            {
+              LowerBound=0;
+            }
+            else
+            {
+              LowerBound=nuoviPositivi.length-7;
+            }
+
+            for (n=LowerBound;n<nuoviPositivi.length;n++)
+            {
+              last7days+=nuoviPositivi[n];
+            }
+            Incidence7days.push(last7days/totalPopulation*100000);
+
             // Process Tamponi
             totaleTamponi.push(el.tamponi);
             deltaTamponi.push(el.tamponi - lastTamponi);
@@ -236,7 +250,6 @@ function Plotdiagrams(region,els,totalPopulation) {
             if (el.tamponi - lastTamponi == 0) {
 
                 newCase_Tamponi.push(0);
-
 
             }
             else {
@@ -313,8 +326,8 @@ function Plotdiagrams(region,els,totalPopulation) {
                         <p>Population: ${totalPopulation}</p>
                         <p>New Cases in 7 days: ${nuoviPositiviLastWeek}</p>
                         <p>Incidence 7-days-cases/100k : ${(nuoviPositiviLastWeek/totalPopulation*100000).toFixed(1)}</p>
-                        <p>Positive/Test: ${(positivitamponiLastWeek*100).toFixed(1)} %</p>
-                        <p>Test/day: ${KPITamponi.toFixed(0)}</p>
+                        <p>Positive/Test (Avg. 7 days): ${(positivitamponiLastWeek*100).toFixed(1)} %</p>
+                        <p>Test/day (Avg. 7 days): ${KPITamponi.toFixed(0)}</p>
                         <p>Hospital/Intensive Care ratio: ${(seriouscaseratio*100).toFixed(1)} %</p>
                         <p>Death Rate: ${KPIDeathRate.toFixed(1)} %</p>`;
 
@@ -352,11 +365,23 @@ function Plotdiagrams(region,els,totalPopulation) {
         type: 'scatter'
     };
 
+    var traceIncidence={
+      x: d,
+      y: Incidence7days,
+      type: 'scatter'
+    };
+
     var traceDecessi = {
         x: d,
         //y: decessi,
         y:deltaDecessi,
         type: 'scatter'
+    };
+
+    var traceDeathRate= {
+      x:d,
+      y:deathRate,
+      type:'scatter'
     };
 
     var newPositiveAverage = {
@@ -387,7 +412,9 @@ function Plotdiagrams(region,els,totalPopulation) {
     var data = [totalCases];
     var data2 = [traceActiveCase, traceOspedalizzati, traceTerapiaIntensiva];
     var data3 = [traceNuoviPositivi, newPositiveAverage];
+    var graphIncidence=[traceIncidence];
     var data4 = [traceDecessi];
+    var graphDataDeathRate=[traceDeathRate];
     var data5 = [traceNewCaseTamponi];
     var data6 = [traceDeltaTamponi];
 
@@ -406,8 +433,15 @@ function Plotdiagrams(region,els,totalPopulation) {
     layout.showlegend = false;
     Plotly.newPlot('NewPositive', data3, layout, { scrollZoom: false });
 
+    layout.title = `${latestUpdate} - 7 Days Incidence ${region}`;
+    Plotly.newPlot('IncidenceRate', graphIncidence, layout, { scrollZoom: false });
+ 
+
     layout.title = `${latestUpdate} - Decessi ${region}`;
     Plotly.newPlot('Decessi', data4, layout, { scrollZoom: false });
+
+    layout.title = `${latestUpdate} - Death Rate ${region}`;
+    Plotly.newPlot('DeathRate', graphDataDeathRate, layout, { scrollZoom: false });
 
     layout.title = `${latestUpdate} - Positivi/Tamponi ${region}`;
     Plotly.newPlot('Tamponi', data5, layout, { scrollZoom: false });
